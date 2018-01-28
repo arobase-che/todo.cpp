@@ -3,7 +3,7 @@ todo.cpp
 
 Todo list program
 
-![Screenshot](capture.png)
+![Screenshot](http://git.ache.one/todo/raw/master/capture.png)
 
 
 Usage : todo [show,add,remove,check,set]
@@ -18,4 +18,4 @@ If many tasks contains the todo-part, all of it will be selected.
 Exemple of how you can use it :
 -------------
 
-![Screenshot](todo.gif)
+![Screenshot](http://git.ache.one/todo/raw/master/todo.gif)
