@@ -188,6 +188,8 @@ int main(int argc, char *argv[]) {
         }else if ( !strcmp( argv[1], "edit") || !strcmp( argv[1], "mod") 
                                              || !strcmp( argv[1], "e")  ) {
             action = 12;
+        }else if ( !strcmp( argv[1], "move") || !strcmp( argv[1], "mv") ) {
+            action = 13;
         }else {}
     } else
             action = 0;
@@ -353,8 +355,83 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 break;
+            case 13: //  Move
+                cout << "Merde !" << endl;
+                {
+                    const char* defaultEditor = "vim",
+                              * const envEditor = getenv("EDITOR"),
+                              * const visEditor = getenv("VISUAL");
+                    if( envEditor && envEditor[0] ) {
+                        defaultEditor = envEditor;
+                    }
+                    if( visEditor && visEditor[0] ) {
+                        defaultEditor = visEditor;
+                    }
+                    size_t ordreNbElem = 0, nbElem_tmp = listTodo.size();
+                    while( nbElem_tmp > 0 ) ordreNbElem++, nbElem_tmp/=10;
+
+                    FILE* tmp = NULL;
+                    char* indexString = new char[ordreNbElem + 1  + 2 ];
+                    //                                        '#'  "\n\0"
+
+                    char fileName[] = "todo.cpp_XXXXXX";
+                    int fd = mkstemp(fileName), currentIndex = 1;
+
+                    for (auto it = begin(listTodo); it != end(listTodo); ++it) {
+                        if( strlen( it->str.c_str() ) > 0 ) {
+                            write(fd, it->str.c_str()+1,
+                                     strlen(it->str.c_str()) -1 );
+                            sprintf(indexString, "#%d\n\r", currentIndex);
+                            write(fd, indexString,
+                                     strlen(indexString) -1 );
+                            currentIndex++;
+                        }
+                    }
+                    delete[] indexString;
+                    close(fd);
+
+                    char* cmd = new char[ 2 + strlen(defaultEditor) + 
+                                            strlen(fileName) ];
+                    bool endReach = false;
+                    sprintf( cmd, "%s %s", defaultEditor, fileName);
+
+                    system(cmd);
 
 
+                    ifstream file(fileName, ios::in);
+
+                    if( file ) {
+                        string line;
+                        auto it = begin(listTodo);
+                        while( getline(file, line) ) {
+                            string newDesc = "";
+                            int correspondIndex = -1;
+                            if( line.find("#") ) {
+                                int coupe = line.rfind("#");
+                                newDesc = line.substr(0, coupe);
+                                correspondIndex = stoi( line.substr(coupe+1) );
+                            }
+                            if( it == end(listTodo) ) {
+                                cerr << "Erreur : Trop de lignes" <<
+                                        "Seule les premières lignes serront "
+                                       " prises en compte" << endl;
+                                break; // for the moment
+                            }
+                            it->str = " " + newDesc;
+                            it->priorite = listTodo[correspondIndex].priorite;
+                            it->etat = listTodo[correspondIndex].etat;
+                            ++it;
+                        }
+                        file.close();
+                    } else {
+                        cerr << "Impossible d'ouvrir le fichier "
+                                "temporaire" << fileName << endl;
+                    }
+
+                    delete[] cmd;
+                    unlink( fileName );
+                }
+                break;
             default:
                 cout << "Erreur : Action incomprise" << endl;
         }
