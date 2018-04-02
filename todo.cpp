@@ -425,9 +425,9 @@ int main(int argc, char *argv[]) {
                                 break; // for the moment
                             }
                             it->str = " " + newDesc;
-                            if( correspondIndex < listTodo.size() && correspondIndex >= 0 ) {
-                                it->priorite = listTodo[correspondIndex].priorite;
-                                it->etat = listTodo[correspondIndex].etat;
+                            if( correspondIndex <= listTodo.size() && correspondIndex > 0 ) {
+                                it->priorite = listTodo[correspondIndex-1].priorite;
+                                it->etat = listTodo[correspondIndex-1].etat;
                             }
                             if( it != end(listTodo) )
                                 ++it;
