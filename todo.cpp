@@ -129,7 +129,15 @@ void modifyTODO( vector<todo>& listTodo, int argc, char* argv[], Functor modif  
         }
     }
 }
-
+void addTODO( vector<todo>& listTodo, todo& td) {
+    for ( int i =  listTodo.size()-1; i >= 0 ; --i)
+        if( listTodo.at(i).str == td.str ) {
+            cerr << "Erreur doublon" << endl;
+            exit(-1);
+            break;
+        }
+    listTodo.push_back(td);
+}
 
 int main(int argc, char *argv[]) {
     color = false;
@@ -225,13 +233,7 @@ int main(int argc, char *argv[]) {
                         break;
                     } else {
                         todo tmpTodo = todoFromCmd(sargv);
-                        for ( int i =  listTodo.size()-1; i >= 0 ; --i)
-                            if( listTodo.at(i).str == tmpTodo.str ) {
-                                cerr << "Erreur doublon" << endl;
-                                exit(-1);
-                                break;
-                            }
-                        listTodo.push_back(tmpTodo);
+                        addTODO(listTodo, tmpTodo);
                     }
 
                     break;
