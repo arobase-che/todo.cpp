@@ -358,7 +358,6 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 13: //  Move
-                cout << "Merde !" << endl;
                 {
                     const char* defaultEditor = "vim",
                               * const envEditor = getenv("EDITOR"),
@@ -408,22 +407,33 @@ int main(int argc, char *argv[]) {
                         while( getline(file, line) ) {
                             string newDesc = "";
                             int correspondIndex = -1;
-                            if( line.find("#") ) {
+                            if( line.find("#") != string::npos ) {
                                 int coupe = line.rfind("#");
                                 newDesc = line.substr(0, coupe);
                                 correspondIndex = stoi( line.substr(coupe+1) );
                             }
                             if( it == end(listTodo) ) {
-                                cerr << "Erreur : Trop de lignes" <<
-                                        "Seule les premières lignes serront "
-                                       " prises en compte" << endl;
+                                do {
+                                    todo tmpTodo;
+                                    tmpTodo.str = " " + line;
+                                    tmpTodo.etat = 0;
+                                    tmpTodo.priorite = 0;
+                                    addTODO(listTodo, tmpTodo);
+                                } while( getline(file, line) );
+                                it = listTodo.end();
+
                                 break; // for the moment
                             }
                             it->str = " " + newDesc;
-                            it->priorite = listTodo[correspondIndex].priorite;
-                            it->etat = listTodo[correspondIndex].etat;
-                            ++it;
+                            if( correspondIndex < listTodo.size() && correspondIndex >= 0 ) {
+                                it->priorite = listTodo[correspondIndex].priorite;
+                                it->etat = listTodo[correspondIndex].etat;
+                            }
+                            if( it != end(listTodo) )
+                                ++it;
                         }
+                        while( it != listTodo.end() )
+                            listTodo.erase(it);
                         file.close();
                     } else {
                         cerr << "Impossible d'ouvrir le fichier "
