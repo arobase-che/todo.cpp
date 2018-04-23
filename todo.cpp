@@ -403,7 +403,8 @@ int main(int argc, char *argv[]) {
 
                     if( file ) {
                         string line;
-                        auto it = begin(listTodo);
+                        vector<todo> tmp_listTodo(listTodo);
+                        auto it = begin(tmp_listTodo);
                         while( getline(file, line) ) {
                             string newDesc = "";
                             int correspondIndex = -1;
@@ -412,15 +413,15 @@ int main(int argc, char *argv[]) {
                                 newDesc = line.substr(0, coupe);
                                 correspondIndex = stoi( line.substr(coupe+1) );
                             }
-                            if( it == end(listTodo) ) {
+                            if( it == end(tmp_listTodo) ) {
                                 do {
                                     todo tmpTodo;
                                     tmpTodo.str = " " + line;
                                     tmpTodo.etat = 0;
                                     tmpTodo.priorite = 0;
-                                    addTODO(listTodo, tmpTodo);
+                                    addTODO(tmp_listTodo, tmpTodo);
                                 } while( getline(file, line) );
-                                it = listTodo.end();
+                                it = tmp_listTodo.end();
 
                                 break; // for the moment
                             }
@@ -429,12 +430,13 @@ int main(int argc, char *argv[]) {
                                 it->priorite = listTodo[correspondIndex-1].priorite;
                                 it->etat = listTodo[correspondIndex-1].etat;
                             }
-                            if( it != end(listTodo) )
+                            if( it != end(tmp_listTodo) )
                                 ++it;
                         }
-                        while( it != listTodo.end() )
-                            listTodo.erase(it);
+                        while( it != tmp_listTodo.end() )
+                            tmp_listTodo.erase(it);
                         file.close();
+                        listTodo = tmp_listTodo;
                     } else {
                         cerr << "Impossible d'ouvrir le fichier "
                                 "temporaire" << fileName << endl;
