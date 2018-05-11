@@ -181,11 +181,11 @@ int main(int argc, char *argv[]) {
                 action = 4;
             else
                 cout << "Erreur : Priorité non interprétable" << endl;
-        }else if ( !strcmp( argv[1], "get") ) {
-            if( argc > 2 && argv[2][0] >= '0' && argv[2][0] <= '9' )
-                action = 5,color = false;
+        }else if ( !strcmp( argv[1], "get") || !strcmp(argv[1], "g") ) {
+            if( argc > 2 )
+                action = 5;
             else
-                cout << "Erreur : Priorité non interprétable" << endl;
+                cout << "Erreur : Besoin d'un sélecteur" << endl;
         }else if ( !strcmp( argv[1], "checked") ) {
             action = 6;
         }else if ( !strcmp( argv[1], "clean") || !strcmp( argv[1], "clear") 
@@ -262,11 +262,26 @@ int main(int argc, char *argv[]) {
                         modifyTODO( listTodo, argc-3, argv+3, [priority](todo& it) { it.priorite = priority; });
                     }
                 break;
-            case 5:  // s 
-                for (auto it = begin(listTodo); it != end(listTodo); ++it)
-                    if( it->priorite == atoi(argv[2]) )
-                        cout << *it;
+            case 5:  // get
+                {
+                    char* res = NULL;
+                    int priorite = strtol(argv[2], &res, 0);
+                    if( res != argv[2] && *res == '\0' ) {
+                        for (auto it = begin(listTodo); it != end(listTodo); ++it)
+                            if( it->priorite == priorite )
+                                cout << *it;
+                    } else {
+                        for (auto it = begin(listTodo); it != end(listTodo); ++it) {
+                            for( int j = 2 ; j < argc ; j++ )
+                                if( it->str.find(argv[j]) != string::npos) {
+                                    cout << *it;
+                                    break;
+                                }
+                        }
+                    }
+
                 return 0;
+                }
             case 6:  // Checked
                 for (auto it = begin(listTodo); it != end(listTodo); ++it)
                     if( it->etat )
